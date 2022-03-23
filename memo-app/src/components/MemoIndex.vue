@@ -1,5 +1,5 @@
 <template>
-  <div class="memo-list-container">
+  <div class="memo-list-container box">
     <ul>
       <li v-for="(memoItem, index) in memoItems" :key="index">
         <MemoTitle :memoItem="memoItem" @click="$_editItem(memoItem)" />
@@ -8,20 +8,22 @@
       </li>
     </ul>
   </div>
-  <div :class="this.$_visibility">
-    <form
-      @submit.prevent="$_onSubmit"
-    >
-      <textarea
-        rows="20"
-        cols="40"
-        v-model="this.editingItem.content"
-      ></textarea>
-      <br />
-      <input type="submit" value="保存" />
-    </form>
-    <button @click="this.$_deleteItem(this.editingItem)">削除</button>
-    <button @click="this.$_closeForm">保存しないで閉じる</button>
+  <div class="memo-form-container box">
+    <div :class="this.$_visibility">
+      <form
+        @submit.prevent="$_onSubmit"
+      >
+        <textarea
+          rows="20"
+          cols="40"
+          v-model="this.editingItem.content"
+        ></textarea>
+        <br />
+        <input type="submit" value="保存" />
+      </form>
+      <button @click="this.$_deleteItem(this.editingItem)">削除</button>
+      <button @click="this.$_closeForm">保存しないで閉じる</button>
+      </div>
   </div>
 </template>
 
@@ -133,7 +135,15 @@ export default {
 </script>
 
 <style>
+.box {
+  display: inline-block;
+  width: 40%;
+  vertical-align: top;
+}
 .memo-form-invisible {
   display: none;
+}
+li {
+  text-align: left;
 }
 </style>
