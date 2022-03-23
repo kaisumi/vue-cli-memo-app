@@ -33,11 +33,6 @@ export default {
     $_onSubmit () {
       localStorage.setItem('memoContent', this.memoContent)
     }
-  },
-  mounted () {
-    window.onload = () => {
-      this.memoContent = localStorage.getItem('memoContent')
-    }
   }
 }
 </script>
