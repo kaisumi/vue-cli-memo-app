@@ -44,6 +44,12 @@ export default {
   },
   methods: {
     $_onSubmit () {
+      if (this.$_getIndex() <= this.editingItem.keyIndex) {
+        localStorage.setItem('memoIndex', this.editingItem.keyIndex + 1)
+        this.memoItems.push(this.editingItem)
+      } else {
+        this.memoItems[this.memoItems.findIndex( (item) => { item.keyIndex === this.editingItem.keyIndex })] = Object.assign({}, this.editingItem)
+      }
       localStorage.setItem(`memoContent${this.editingItem.keyIndex}`, this.editingItem.content)
       this.$_closeForm()
     },
@@ -55,6 +61,7 @@ export default {
         memoItems[i].keyIndex = i
       }
       localStorage.setItem('memoIndex', i + 1)
+      console.log(`resetLocalStorage: index=${i + 1}`)
     },
     $_pushData (countEffectives, dataArray) {
       if (countEffectives <= this.memoItems.length) return
@@ -73,22 +80,23 @@ export default {
       this.$_closeForm()
     },
     $_editItem (memoItem) {
-      this.editingItem = memoItem
+      this.editingItem = Object.assign({}, memoItem)
       this.formVisible = true
     },
     $_closeForm () {
       this.formVisible = false
       this.$_onLoad
     },
+    $_getIndex () {
+      const memoIndex = parseInt(localStorage.getItem('memoIndex'))
+      console.log(`getIndex: index=${isNaN(memoIndex) ? 0 : memoIndex}`)
+      return isNaN(memoIndex) ? 0 : memoIndex
+    },
     $_newItem () {
-      const memoIndex = this.$_getIndex
       const newItem = {
-        keyIndex: memoIndex,
+        keyIndex: this.$_getIndex(),
         content: ''
       }
-      localStorage.setItem('memoIndex', newItem.keyIndex + 1)
-      localStorage.setItem(`memoContent${newItem.keyIndex}`, newItem.content)
-      this.memoItems.push(newItem)
       this.$_editItem(newItem)
     }
   },
@@ -96,10 +104,6 @@ export default {
     $_visibility: function () {
       if (this.formVisible) return 'memo-form'
       return 'memo-form-invisible'
-    },
-    $_getIndex: function () {
-      const memoIndex = parseInt(localStorage.getItem('memoIndex'))
-      return isNaN(memoIndex) ? 0 : memoIndex
     },
     $_onLoad: function () {
       const keys = Object.keys(localStorage)
@@ -122,7 +126,7 @@ export default {
         content: '',
         keyIndex: 0
       }
-      const count = this.$_getIndex
+      const count = this.$_getIndex()
       for (let k = 0; k <= count; k++) {
         dataArray.push(Object.assign({}, dataObject))
       }
