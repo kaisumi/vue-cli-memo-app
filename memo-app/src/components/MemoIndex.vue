@@ -43,7 +43,6 @@ export default {
   },
   methods: {
     $_onSubmit () {
-      console.log(`memoContent${this.editingItem.keyIndex}: ${this.editingItem.content}`)
       localStorage.setItem(`memoContent${this.editingItem.keyIndex}`, this.editingItem.content)
       this.$_closeForm()
     },
@@ -54,14 +53,12 @@ export default {
         keyIndex: 0
       }
       const count = parseInt(localStorage.getItem('memoIndex'))
-      console.log(`count: ${count}`)
       for (let k = 0; k <= count; k++) {
         dataArray.push(Object.assign({}, dataObject))
       }
       return dataArray
     },
     $_resetLocalStorage (memoItems) {
-      console.log('resetLocalStorage')
       localStorage.clear()
       let i
       for (i = 0; i < memoItems.length; i++) {
@@ -71,23 +68,17 @@ export default {
       localStorage.setItem('memoIndex', i + 1)
     },
     $_pushData (countEffectives, dataArray) {
-      console.log(dataArray.length)
       if (countEffectives <= this.memoItems.length) return
       const memoItems = []
       let i
       for (i = 0; i < dataArray.length; i++) {
         if (dataArray[i].content !== '') memoItems.push(dataArray[i])
       }
-      console.log('before reset')
       this.$_resetLocalStorage(memoItems)
-      console.log('after reset')
-      // this.$emit('set-items', memoItems)
       this.memoItems = memoItems
     },
     $_deleteItem (memoItem) {
-      // this.$emit('delete-item', memoItem)
       const index = this.memoItems.findIndex( (item) => { item.keyIndex === memoItem.keyIndex })
-      console.log(`splice: ${index}`)
       this.memoItems.splice(index, 1)
       localStorage.removeItem(`memoContent${memoItem.keyIndex}`)
       this.$_closeForm()
@@ -126,11 +117,9 @@ export default {
 
         countEffectives++
         let j = parseInt(keys[i].replace(/memoContent(\d+)/, '$1'))
-        console.log(dataArray.length)
         dataArray[j].content = localStorage.getItem(`memoContent${j}`)
         dataArray[j].keyIndex = j // いらないかも？
       }
-      console.log('before pushData')
       this.$_pushData(countEffectives, dataArray)
       return true
     }
