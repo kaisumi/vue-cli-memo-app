@@ -1,5 +1,5 @@
 <template>
-  <a>{{ $_title }}</a>
+  <a @click="$_editMemo">{{ $_title }}</a>
 </template>
 <script>
 export default {
@@ -8,6 +8,11 @@ export default {
     memoItem: {
       type: Object,
       required: true
+    }
+  },
+  methods: {
+    $_editMemo() {
+      this.$emit('memoEdit',this.memoItem)
     }
   },
   computed: {
