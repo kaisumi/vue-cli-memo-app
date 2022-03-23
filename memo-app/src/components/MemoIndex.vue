@@ -21,7 +21,7 @@
       <input type="submit" value="保存" />
     </form>
     <button @click="this.$_deleteItem(this.editingItem)">削除</button>
-    <button @click="this.$_closeForm">閉じる</button>
+    <button @click="this.$_closeForm">保存しないで閉じる</button>
   </div>
 </template>
 
@@ -45,6 +45,7 @@ export default {
     $_onSubmit () {
       console.log(`memoContent${this.editingItem.keyIndex}: ${this.editingItem.content}`)
       localStorage.setItem(`memoContent${this.editingItem.keyIndex}`, this.editingItem.content)
+      this.$_closeForm()
     },
     $_emptyDataArray () {
       const dataArray = []
@@ -53,6 +54,7 @@ export default {
         keyIndex: 0
       }
       const count = parseInt(localStorage.getItem('memoIndex'))
+      console.log(`count: ${count}`)
       for (let k = 0; k <= count; k++) {
         dataArray.push(Object.assign({}, dataObject))
       }
@@ -69,8 +71,8 @@ export default {
       localStorage.setItem('memoIndex', i + 1)
     },
     $_pushData (countEffectives, dataArray) {
+      console.log(dataArray.length)
       if (countEffectives <= this.memoItems.length) return
-
       const memoItems = []
       let i
       for (i = 0; i < dataArray.length; i++) {
@@ -84,7 +86,9 @@ export default {
     },
     $_deleteItem (memoItem) {
       // this.$emit('delete-item', memoItem)
-      this.memoItems.splice(memoItem.keyIndex, 1)
+      const index = this.memoItems.findIndex( (item) => { item.keyIndex === memoItem.keyIndex })
+      console.log(`splice: ${index}`)
+      this.memoItems.splice(index, 1)
       localStorage.removeItem(`memoContent${memoItem.keyIndex}`)
       this.$_closeForm()
     },
@@ -94,12 +98,16 @@ export default {
     },
     $_closeForm () {
       this.formVisible = false
+      this.$_onLoad
     },
     $_newItem () {
+      const memoIndex = parseInt(localStorage.getItem('memoIndex'))
       const newItem = {
-        keyIndex: localStorage.getItem('memoIndex') + 1,
+        keyIndex: isNaN(memoIndex) ? 0 : memoIndex,
         content: ''
       }
+      localStorage.setItem('memoIndex', newItem.keyIndex + 1)
+      localStorage.setItem(`memoContent${newItem.keyIndex}`, newItem.content)
       this.memoItems.push(newItem)
       this.$_editItem(newItem)
     }
@@ -108,23 +116,28 @@ export default {
     $_visibility: function () {
       if (this.formVisible) return 'memo-form'
       return 'memo-form-invisible'
-    }
-  },
-  mounted () {
-    window.onload = () => {
+    },
+    $_onLoad: function () {
       const keys = Object.keys(localStorage)
       const dataArray = this.$_emptyDataArray()
       let countEffectives = 0
-      let i
-      for (i = 0; i < keys.length; i++) {
+      for (let i = 0; i < keys.length; i++) {
         if (!/memoContent(\d+)/.test(keys[i])) continue
 
         countEffectives++
         let j = parseInt(keys[i].replace(/memoContent(\d+)/, '$1'))
+        console.log(dataArray.length)
         dataArray[j].content = localStorage.getItem(`memoContent${j}`)
         dataArray[j].keyIndex = j // いらないかも？
       }
+      console.log('before pushData')
       this.$_pushData(countEffectives, dataArray)
+      return true
+    }
+  },
+  mounted () {
+    window.onload = () => {
+      this.$_onLoad
     }
   }
 }
