@@ -44,38 +44,35 @@ export default {
   },
   methods: {
     $_onSubmit () {
-      if (this.$_getIndex() <= this.editingItem.keyIndex) {
-        localStorage.setItem('memoIndex', this.editingItem.keyIndex + 1)
-        this.memoItems.push(this.editingItem)
-      } else {
-        this.memoItems[this.memoItems.findIndex( (item) => { return item.keyIndex === this.editingItem.keyIndex })] = Object.assign({}, this.editingItem)
-      }
-      localStorage.setItem(`memoContent${this.editingItem.keyIndex}`, this.editingItem.content)
+      if (this.$_isToCreate(this.editingItem))
+        this.$_createItem(this.editingItem)
+      else
+        this.$_updateItem(this.editingItem)
+
+      this.$_setMemo(this.editingItem)
       this.$_closeForm()
     },
-    $_resetLocalStorage (memoItems) {
-      localStorage.clear()
-      let i
-      for (i = 0; i < memoItems.length; i++) {
-        localStorage.setItem(`memoContent${i}`, memoItems[i].content)
-        memoItems[i].keyIndex = i
-      }
-      localStorage.setItem('memoIndex', i + 1)
+    $_findMemoIndex (index) {
+      const foundIndex = this.memoItems.findIndex( (item) => {
+        return item.keyIndex === index
+      })
+      return foundIndex
     },
-    $_pushData (countEffectives, dataArray) {
-      if (countEffectives <= this.memoItems.length) return
-      const memoItems = []
-      let i
-      for (i = 0; i < dataArray.length; i++) {
-        if (dataArray[i].content !== '') memoItems.push(dataArray[i])
-      }
-      this.$_resetLocalStorage(memoItems)
-      this.memoItems = memoItems
+    $_isToCreate (item) {
+      return this.$_getIndex() <= item.keyIndex
+    },
+    $_createItem (item) {
+      this.$_setIndex(item.keyIndex + 1)
+      this.memoItems.push(item)
+    },
+    $_updateItem (item) {
+        const index = this.$_findMemoIndex(item.keyIndex)
+        this.memoItems[index] = Object.assign({}, item)
     },
     $_deleteItem (memoItem) {
-      const index = this.memoItems.findIndex( (item) => { return item.keyIndex === memoItem.keyIndex })
+      const index = this.$_findMemoIndex(memoItem.keyIndex)
       this.memoItems.splice(index, 1)
-      localStorage.removeItem(`memoContent${memoItem.keyIndex}`)
+      this.$_deleteMemo(memoItem.keyIndex)
       this.$_closeForm()
     },
     $_editItem (memoItem) {
@@ -84,11 +81,7 @@ export default {
     },
     $_closeForm () {
       this.formVisible = false
-      this.$_onLoad
-    },
-    $_getIndex () {
-      const memoIndex = parseInt(localStorage.getItem('memoIndex'))
-      return isNaN(memoIndex) ? 0 : memoIndex
+      this.$_loadData
     },
     $_newItem () {
       const newItem = {
@@ -96,6 +89,41 @@ export default {
         content: ''
       }
       this.$_editItem(newItem)
+    },
+    $_resetData (memoItems) {
+      localStorage.clear()
+      let i
+      for (i = 0; i < memoItems.length; i++) {
+        memoItems[i].keyIndex = i
+        this.$_setMemo(memoItems[i])
+      }
+      this.$_setIndex(i + 1)
+    },
+    $_pushData (countEffectives, dataArray) {
+      if (countEffectives <= this.memoItems.length) return
+      const memoItems = []
+      let i
+      for (i = 0; i < dataArray.length; i++) {
+        if (dataArray[i].content !== '') memoItems.push(dataArray[i])
+      }
+      this.$_resetData(memoItems)
+      this.memoItems = memoItems
+    },
+    $_deleteMemo (index) {
+      localStorage.removeItem(`memoContent${index}`)
+    },
+    $_setIndex (index) {
+      localStorage.setItem('memoIndex', index)
+    },
+    $_setMemo (memoItem) {
+      localStorage.setItem(`memoContent${memoItem.keyIndex}`, memoItem.content)
+    },
+    $_getIndex () {
+      const memoIndex = parseInt(localStorage.getItem('memoIndex'))
+      return isNaN(memoIndex) ? 0 : memoIndex
+    },
+    $_getContent (index) {
+      return localStorage.getItem(`memoContent${index}`)
     }
   },
   computed: {
@@ -103,7 +131,7 @@ export default {
       if (this.formVisible) return 'memo-form'
       return 'memo-form-invisible'
     },
-    $_onLoad: function () {
+    $_loadData: function () {
       const keys = Object.keys(localStorage)
       const dataArray = this.$_emptyDataArray
       let countEffectives = 0
@@ -112,28 +140,27 @@ export default {
 
         countEffectives++
         let j = parseInt(keys[i].replace(/memoContent(\d+)/, '$1'))
-        dataArray[j].content = localStorage.getItem(`memoContent${j}`)
-        dataArray[j].keyIndex = j // いらないかも？
+        dataArray[j].content = this.$_getContent(j)
+        dataArray[j].keyIndex = j
       }
       this.$_pushData(countEffectives, dataArray)
       return true
     },
     $_emptyDataArray: function () {
       const dataArray = []
-      const dataObject = {
-        content: '',
-        keyIndex: 0
-      }
-      const count = this.$_getIndex()
-      for (let k = 0; k <= count; k++) {
-        dataArray.push(Object.assign({}, dataObject))
+      for (let k = 0; k <= this.$_getIndex(); k++) {
+        const dataObject = {
+          content: '',
+          keyIndex: 0
+        }
+        dataArray.push(dataObject)
       }
       return dataArray
     }
   },
   mounted () {
     window.onload = () => {
-      this.$_onLoad
+      this.$_loadData
     }
   }
 }
