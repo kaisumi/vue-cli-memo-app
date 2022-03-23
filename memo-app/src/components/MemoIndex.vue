@@ -81,7 +81,7 @@ export default {
     },
     $_closeForm () {
       this.formVisible = false
-      this.$_loadData
+      this.$_resetData(this.memoItems)
     },
     $_newItem () {
       const newItem = {
