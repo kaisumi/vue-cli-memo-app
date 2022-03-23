@@ -4,7 +4,7 @@
       <li v-for="(memoItem, index) in memoItems" :key="index">
         <MemoTitle :memoItem="memoItem" @click="$_editItem(memoItem)" />
       </li>
-      <li @click="$_newItem()">+
+      <li @click="this.$_newItem">+
       </li>
     </ul>
   </div>
@@ -30,7 +30,6 @@
 <script>
 
 import MemoTitle from './MemoTitle.vue'
-// import MemoEdit from './MemoEdit.vue'
 export default {
   name: 'MemoIndex',
   components: {
@@ -47,18 +46,6 @@ export default {
     $_onSubmit () {
       localStorage.setItem(`memoContent${this.editingItem.keyIndex}`, this.editingItem.content)
       this.$_closeForm()
-    },
-    $_emptyDataArray () {
-      const dataArray = []
-      const dataObject = {
-        content: '',
-        keyIndex: 0
-      }
-      const count = parseInt(localStorage.getItem('memoIndex'))
-      for (let k = 0; k <= count; k++) {
-        dataArray.push(Object.assign({}, dataObject))
-      }
-      return dataArray
     },
     $_resetLocalStorage (memoItems) {
       localStorage.clear()
@@ -94,9 +81,9 @@ export default {
       this.$_onLoad
     },
     $_newItem () {
-      const memoIndex = parseInt(localStorage.getItem('memoIndex'))
+      const memoIndex = this.$_getIndex
       const newItem = {
-        keyIndex: isNaN(memoIndex) ? 0 : memoIndex,
+        keyIndex: memoIndex,
         content: ''
       }
       localStorage.setItem('memoIndex', newItem.keyIndex + 1)
@@ -110,9 +97,13 @@ export default {
       if (this.formVisible) return 'memo-form'
       return 'memo-form-invisible'
     },
+    $_getIndex: function () {
+      const memoIndex = parseInt(localStorage.getItem('memoIndex'))
+      return isNaN(memoIndex) ? 0 : memoIndex
+    },
     $_onLoad: function () {
       const keys = Object.keys(localStorage)
-      const dataArray = this.$_emptyDataArray()
+      const dataArray = this.$_emptyDataArray
       let countEffectives = 0
       for (let i = 0; i < keys.length; i++) {
         if (!/memoContent(\d+)/.test(keys[i])) continue
@@ -124,6 +115,18 @@ export default {
       }
       this.$_pushData(countEffectives, dataArray)
       return true
+    },
+    $_emptyDataArray: function () {
+      const dataArray = []
+      const dataObject = {
+        content: '',
+        keyIndex: 0
+      }
+      const count = this.$_getIndex
+      for (let k = 0; k <= count; k++) {
+        dataArray.push(Object.assign({}, dataObject))
+      }
+      return dataArray
     }
   },
   mounted () {
@@ -134,7 +137,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .box {
   display: inline-block;
   width: 40%;

@@ -3,8 +3,6 @@
 </template>
 
 <script>
-// import HelloWorld from './components/HelloWorld.vue'
-// import MemoEdit from './components/MemoEdit.vue'
 import MemoIndex from './components/MemoIndex.vue'
 
 export default {
