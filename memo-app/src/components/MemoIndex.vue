@@ -4,25 +4,25 @@
       <li v-for="(memoItem, index) in memoItems" :key="index">
         <MemoTitle :memoItem="memoItem" @click="$_editItem(memoItem)" />
       </li>
-      <li @click="this.$_newItem">+
+      <li @click="$_newItem">+
       </li>
     </ul>
   </div>
   <div class="memo-form-container box">
-    <div :class="this.$_visibility">
+    <div :class="$_visibility">
       <form
         @submit.prevent="$_onSubmit"
       >
         <textarea
           rows="20"
           cols="40"
-          v-model="this.editingItem.content"
+          v-model="editingItem.content"
         ></textarea>
         <br />
         <input type="submit" value="保存" />
       </form>
-      <button @click="this.$_deleteItem(this.editingItem)">削除</button>
-      <button @click="this.$_closeForm">保存しないで閉じる</button>
+      <button @click="$_deleteItem(editingItem)">削除</button>
+      <button @click="$_closeForm">保存しないで閉じる</button>
       </div>
   </div>
 </template>
@@ -48,7 +48,7 @@ export default {
         localStorage.setItem('memoIndex', this.editingItem.keyIndex + 1)
         this.memoItems.push(this.editingItem)
       } else {
-        this.memoItems[this.memoItems.findIndex( (item) => { item.keyIndex === this.editingItem.keyIndex })] = Object.assign({}, this.editingItem)
+        this.memoItems[this.memoItems.findIndex( (item) => { return item.keyIndex === this.editingItem.keyIndex })] = Object.assign({}, this.editingItem)
       }
       localStorage.setItem(`memoContent${this.editingItem.keyIndex}`, this.editingItem.content)
       this.$_closeForm()
@@ -61,7 +61,6 @@ export default {
         memoItems[i].keyIndex = i
       }
       localStorage.setItem('memoIndex', i + 1)
-      console.log(`resetLocalStorage: index=${i + 1}`)
     },
     $_pushData (countEffectives, dataArray) {
       if (countEffectives <= this.memoItems.length) return
@@ -74,7 +73,7 @@ export default {
       this.memoItems = memoItems
     },
     $_deleteItem (memoItem) {
-      const index = this.memoItems.findIndex( (item) => { item.keyIndex === memoItem.keyIndex })
+      const index = this.memoItems.findIndex( (item) => { return item.keyIndex === memoItem.keyIndex })
       this.memoItems.splice(index, 1)
       localStorage.removeItem(`memoContent${memoItem.keyIndex}`)
       this.$_closeForm()
@@ -89,7 +88,6 @@ export default {
     },
     $_getIndex () {
       const memoIndex = parseInt(localStorage.getItem('memoIndex'))
-      console.log(`getIndex: index=${isNaN(memoIndex) ? 0 : memoIndex}`)
       return isNaN(memoIndex) ? 0 : memoIndex
     },
     $_newItem () {
