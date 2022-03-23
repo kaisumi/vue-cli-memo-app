@@ -1,6 +1,6 @@
 <template>
   <form
-    class="memo-form"
+    :class="this.$_invisible"
     @submit.prevent="$_onSubmit"
   >
     <textarea
@@ -19,7 +19,14 @@ export default {
   name: 'MemoEdit',
   data () {
     return {
-      memoContent: ''
+      memoContent: '',
+      formVisible: true
+    }
+  },
+  computed: {
+    $_invisible: function () {
+      if (this.formVisible) return 'memo-form'
+      return 'memo-form-invisible'
     }
   },
   methods: {
@@ -34,3 +41,9 @@ export default {
   }
 }
 </script>
+
+<style>
+.memo-form-invisible {
+  display: none;
+}
+</style>
