@@ -1,15 +1,15 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <MemoEdit />
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+// import HelloWorld from './components/HelloWorld.vue'
+import MemoEdit from './components/MemoEdit.vue'
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    MemoEdit
   }
 }
 </script>
