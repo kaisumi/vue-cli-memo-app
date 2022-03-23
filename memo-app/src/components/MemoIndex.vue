@@ -4,6 +4,8 @@
       <li v-for="(memoItem, index) in memoItems" :key="index">
         <MemoTitle :memoItem="memoItem" @click="$_editItem(memoItem)" />
       </li>
+      <li @click="$_newItem()">+
+      </li>
     </ul>
   </div>
   <div :class="this.$_visibility">
@@ -57,6 +59,7 @@ export default {
       return dataArray
     },
     $_resetLocalStorage (memoItems) {
+      console.log('resetLocalStorage')
       localStorage.clear()
       let i
       for (i = 0; i < memoItems.length; i++) {
@@ -73,7 +76,9 @@ export default {
       for (i = 0; i < dataArray.length; i++) {
         if (dataArray[i].content !== '') memoItems.push(dataArray[i])
       }
+      console.log('before reset')
       this.$_resetLocalStorage(memoItems)
+      console.log('after reset')
       // this.$emit('set-items', memoItems)
       this.memoItems = memoItems
     },
@@ -84,13 +89,19 @@ export default {
       this.$_closeForm()
     },
     $_editItem (memoItem) {
-      console.log(`editingItem:`)
-      console.log(memoItem)
       this.editingItem = memoItem
       this.formVisible = true
     },
     $_closeForm () {
       this.formVisible = false
+    },
+    $_newItem () {
+      const newItem = {
+        keyIndex: localStorage.getItem('memoIndex') + 1,
+        content: ''
+      }
+      this.memoItems.push(newItem)
+      this.$_editItem(newItem)
     }
   },
   computed: {
@@ -101,9 +112,7 @@ export default {
   },
   mounted () {
     window.onload = () => {
-      console.log('onload')
       const keys = Object.keys(localStorage)
-      console.log(keys)
       const dataArray = this.$_emptyDataArray()
       let countEffectives = 0
       let i
