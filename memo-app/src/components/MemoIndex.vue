@@ -4,8 +4,7 @@
       <li v-for="(memoItem, index) in memoItems" :key="index">
         <MemoTitle :memoItem="memoItem" @click="$_editItem(memoItem)" />
       </li>
-      <li @click="$_newItem">+
-      </li>
+      <li id="new-item" @click="$_newItem"></li>
     </ul>
   </div>
   <div class="memo-form-container box">
@@ -15,7 +14,6 @@
       >
         <textarea
           rows="20"
-          cols="40"
           v-model="editingItem.content"
         ></textarea>
         <br />
@@ -177,5 +175,13 @@ export default {
 }
 li {
   text-align: left;
+  cursor: pointer;
+}
+#new-item {
+  list-style-type: "+  ";
+  font-weight: bolder;
+}
+textarea {
+  width: 100%;
 }
 </style>
