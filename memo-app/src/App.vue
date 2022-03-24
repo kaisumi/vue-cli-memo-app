@@ -1,4 +1,6 @@
 <template>
+  <h1>Memo App</h1>
+  <p>Click "<b>+</b>" to create a new memo.</p>
   <MemoIndex />
 </template>
 
