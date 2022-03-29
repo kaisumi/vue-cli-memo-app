@@ -49,6 +49,7 @@ export default {
 
       this.$_setMemo(this.editingItem)
       this.$_closeForm()
+      this.$_resetData(this.memoItems)
     },
     $_findMemoIndex (index) {
       return this.memoItems.findIndex( (item) => item.keyIndex === index)
@@ -69,6 +70,7 @@ export default {
       this.memoItems.splice(index, 1)
       this.$_deleteMemo(memoItem.keyIndex)
       this.$_closeForm()
+      this.$_resetData(this.memoItems)
     },
     $_editItem (memoItem) {
       this.editingItem = Object.assign({}, memoItem)
@@ -76,7 +78,6 @@ export default {
     },
     $_closeForm () {
       this.formVisible = false
-      this.$_resetData(this.memoItems)
     },
     $_newItem () {
       const newItem = {
