@@ -51,10 +51,7 @@ export default {
       this.$_closeForm()
     },
     $_findMemoIndex (index) {
-      const foundIndex = this.memoItems.findIndex( (item) => {
-        return item.keyIndex === index
-      })
-      return foundIndex
+      return this.memoItems.findIndex( (item) => item.keyIndex === index)
     },
     $_isToCreate (item) {
       return this.$_getIndex() <= item.keyIndex
