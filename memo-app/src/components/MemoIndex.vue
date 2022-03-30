@@ -2,7 +2,7 @@
   <div class="memo-list-container box">
     <ul>
       <li v-for="(memoItem, index) in memoItems" :key="index">
-        <MemoTitle :memoItem="memoItem" @click="$_editItem(memoItem)" />
+        <MemoTitle :memoItem="memoItem" @click="$_editItem(index)" />
       </li>
       <li id="new-item" @click="$_newItem"></li>
     </ul>
@@ -14,12 +14,12 @@
       >
         <textarea
           rows="20"
-          v-model="editingItem.content"
+          v-model="editingItem"
         ></textarea>
         <br />
         <input type="submit" value="保存" />
       </form>
-      <button @click="$_deleteItem(editingItem)">削除</button>
+      <button @click="$_deleteItem(editingIndex)">削除</button>
       <button @click="$_closeForm">保存しないで閉じる</button>
       </div>
   </div>
@@ -37,101 +37,54 @@ export default {
   data () {
     return {
       memoItems: [],
-      editingItem: {},
+      editingIndex: 0,
+      editingItem: '',
       formVisible: false
     }
   },
   methods: {
     $_onSubmit () {
-      if (this.$_isToCreate(this.editingItem))
+      if (this.editingIndex === this.memoItems.length)
         this.$_createItem(this.editingItem)
       else
         this.$_updateItem(this.editingItem)
 
-      LocalStorage.setMemo(this.editingItem)
+      LocalStorage.setMemoData(this.memoItems)
       this.$_closeForm()
-      LocalStorage.resetData(this.memoItems)
-    },
-    $_findMemoIndex (index) {
-      return this.memoItems.findIndex( (item) => item.keyIndex === index)
-    },
-    $_isToCreate (item) {
-      return LocalStorage.getIndex() <= item.keyIndex
     },
     $_createItem (item) {
-      LocalStorage.setIndex(item.keyIndex + 1)
       this.memoItems.push(item)
     },
     $_updateItem (item) {
-        const index = this.$_findMemoIndex(item.keyIndex)
-        this.memoItems[index] = item
+      this.memoItems[this.editingIndex] = item
     },
-    $_deleteItem (memoItem) {
-      const index = this.$_findMemoIndex(memoItem.keyIndex)
+    $_deleteItem (index) {
       this.memoItems.splice(index, 1)
-      LocalStorage.deleteMemo(memoItem.keyIndex)
+      LocalStorage.setMemoData(this.memoItems)
       this.$_closeForm()
-      LocalStorage.resetData(this.memoItems)
     },
-    $_editItem (memoItem) {
-      this.editingItem = Object.assign({}, memoItem)
+    $_editItem (index) {
+      this.editingIndex = index
+      this.editingItem = this.memoItems[index]
       this.formVisible = true
     },
     $_closeForm () {
       this.formVisible = false
     },
     $_newItem () {
-      const newItem = {
-        keyIndex: LocalStorage.getIndex(),
-        content: ''
-      }
-      this.$_editItem(newItem)
-    },
-    $_pushData (countEffectives, dataArray) {
-      if (countEffectives <= this.memoItems.length) return
-      const memoItems = []
-      let i
-      for (i = 0; i < dataArray.length; i++) {
-        if (dataArray[i].content !== '') memoItems.push(dataArray[i])
-      }
-      LocalStorage.resetData(memoItems)
-      this.memoItems = memoItems
+      this.editingIndex = this.memoItems.length
+      this.editingItem = ''
+      this.formVisible = true
     }
   },
   computed: {
     $_visibility: function () {
       if (this.formVisible) return 'memo-form'
       return 'memo-form-invisible'
-    },
-    $_loadData: function () {
-      const keys = LocalStorage.keys()
-      const dataArray = this.$_emptyDataArray
-      let countEffectives = 0
-      for (let i = 0; i < keys.length; i++) {
-        if (!/memoContent(\d+)/.test(keys[i])) continue
-
-        countEffectives++
-        let j = parseInt(keys[i].replace(/memoContent(\d+)/, '$1'))
-        dataArray[j].content = LocalStorage.getContent(j)
-        dataArray[j].keyIndex = j
-      }
-      this.$_pushData(countEffectives, dataArray)
-      return true
-    },
-    $_emptyDataArray: function () {
-      const dataArray = []
-      for (let k = 0; k <= LocalStorage.getIndex(); k++) {
-        const dataObject = {
-          content: '',
-          keyIndex: 0
-        }
-        dataArray.push(dataObject)
-      }
-      return dataArray
     }
   },
   mounted () {
-    this.$_loadData
+    this.memoItems = LocalStorage.getMemoData()
   }
 }
 </script>

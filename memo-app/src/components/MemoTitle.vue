@@ -6,13 +6,13 @@ export default {
   name: 'MemoTitle',
   props: {
     memoItem: {
-      type: Object,
+      type: String,
       required: true
     }
   },
   computed: {
     $_title: function () {
-      const lines = this.memoItem.content.split('\n')
+      const lines = this.memoItem.split('\n')
       return lines[0]
     }
   }
