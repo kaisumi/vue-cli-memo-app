@@ -16,6 +16,14 @@ function getIndex () {
 function getContent (index) {
   return localStorage.getItem(`memoContent${index}`)
 }
+function setMemoData (memoData) {
+  localStorage.setItem('memoData', JSON.stringify(memoData))
+}
+function getMemoData () {
+  const memoData = JSON.parse(localStorage.getItem('memoData'))
+  console.log(memoData)
+  return memoData
+}
 function clear() {
   localStorage.clear()
 }
@@ -31,4 +39,4 @@ function resetData (memoItems) {
   }
   setIndex(i + 1)
 }
-export default { deleteMemo, setIndex, setMemo, getIndex, getContent, clear, keys, resetData }
+export default { deleteMemo, setIndex, setMemo, getIndex, getContent, setMemoData, getMemoData, clear, keys, resetData }
