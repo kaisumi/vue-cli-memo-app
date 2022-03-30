@@ -131,9 +131,7 @@ export default {
     }
   },
   mounted () {
-    window.onload = () => {
-      this.$_loadData
-    }
+    this.$_loadData
   }
 }
 </script>
