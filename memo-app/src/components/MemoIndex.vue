@@ -64,7 +64,7 @@ export default {
     },
     $_updateItem (item) {
         const index = this.$_findMemoIndex(item.keyIndex)
-        this.memoItems[index] = Object.assign({}, item)
+        this.memoItems[index] = item
     },
     $_deleteItem (memoItem) {
       const index = this.$_findMemoIndex(memoItem.keyIndex)
